@@ -1,31 +1,43 @@
 using System;
 using System.CodeDom;
+using System.Linq;
 using NMG.Core.Util;
 
 namespace NMG.Core.Generator
 {
     public class CodeGenerationHelper
     {
-        public CodeCompileUnit GetCodeCompileUnit(string nameSpace, string className, params bool[] isCastle)
-        {
-            var codeCompileUnit = new CodeCompileUnit();
-            var codeNamespace = new CodeNamespace(nameSpace);
+        public CodeCompileUnit GetCodeCompileUnit(CodeCompileUnit codeCompileUnit, string nameSpace, string className, params bool[] isCastle) {
+            if (codeCompileUnit.Namespaces.Cast<CodeNamespace>().All(cn => cn.Name != nameSpace)) {
+                var codeNamespace = new CodeNamespace(nameSpace);
+                codeCompileUnit.Namespaces.Add(codeNamespace);
+            }
             var codeTypeDeclaration = new CodeTypeDeclaration(className);
-            if (null != isCastle && isCastle.Length > 0 && Convert.ToBoolean(isCastle[0]))
-            {
+            if (null != isCastle && isCastle.Length > 0 && Convert.ToBoolean(isCastle[0])) {
                 var codeAttributeDeclaration = new CodeAttributeDeclaration("ActiveRecord");
                 codeTypeDeclaration.BaseTypes.Add(new CodeTypeReference("ActiveRecordValidationBase<" + className + ">"));
                 codeTypeDeclaration.CustomAttributes.Add(codeAttributeDeclaration);
             }
-
-            codeNamespace.Types.Add(codeTypeDeclaration);
-            codeCompileUnit.Namespaces.Add(codeNamespace);
+            codeCompileUnit.Namespaces.Cast<CodeNamespace>().Single(cn => cn.Name == nameSpace).Types.Add(codeTypeDeclaration);
             return codeCompileUnit;
         }
+        
+        public CodeCompileUnit GetCodeCompileUnit(string nameSpace, string className, params bool[] isCastle) {
+            return GetCodeCompileUnit(new CodeCompileUnit(), nameSpace, className, isCastle);
+        }
 
-        public CodeCompileUnit GetCodeCompileUnitWithInheritanceAndInterface(string nameSpace, string className, string inheritanceAndInterface, params bool[] isCastle)
-        {
-            var codeCompileUnit = GetCodeCompileUnit(nameSpace, className, isCastle);
+        public CodeCompileUnit GetCodeCompileUnitWithInheritanceAndInterface(string nameSpace, string className,
+                                                                             string inheritanceAndInterface,
+                                                                             params bool[] isCastle) {
+            return GetCodeCompileUnitWithInheritanceAndInterface(new CodeCompileUnit(), nameSpace, className,
+                                                                 inheritanceAndInterface, isCastle);
+
+        }
+        public CodeCompileUnit GetCodeCompileUnitWithInheritanceAndInterface(CodeCompileUnit codeCompileUnit, string nameSpace, string className,
+                                                                             string inheritanceAndInterface,
+                                                                             params bool[] isCastle) {
+            
+            codeCompileUnit = GetCodeCompileUnit(codeCompileUnit, nameSpace, className, isCastle);
             if (!string.IsNullOrEmpty(inheritanceAndInterface))
             {
                 foreach (CodeNamespace ns in codeCompileUnit.Namespaces)
@@ -59,8 +71,8 @@ namespace NMG.Core.Generator
             var assignStatement = new CodeAssignStatement(codeFieldReferenceExpression,
                                                           new CodePropertySetValueReferenceExpression());
             codeMemberProperty.SetStatements.Add(assignStatement);
-            if (!useLazy)
-                codeMemberProperty.Attributes = codeMemberProperty.Attributes | MemberAttributes.Final;
+            /*if (!useLazy)
+                codeMemberProperty.Attributes = codeMemberProperty.Attributes | MemberAttributes.Final;*/
             return codeMemberProperty;
         }
 
@@ -83,8 +95,8 @@ namespace NMG.Core.Generator
             var assignStatement = new CodeAssignStatement(codeFieldReferenceExpression,
                                                           new CodePropertySetValueReferenceExpression());
             codeMemberProperty.SetStatements.Add(assignStatement);
-            if (!useLazy)
-                codeMemberProperty.Attributes = codeMemberProperty.Attributes | MemberAttributes.Final;
+            /*if (!useLazy)
+                codeMemberProperty.Attributes = codeMemberProperty.Attributes | MemberAttributes.Final;*/
             return codeMemberProperty;
         }
 
@@ -113,8 +125,8 @@ namespace NMG.Core.Generator
             var assignStatement = new CodeAssignStatement(codeFieldReferenceExpression,
                                                           new CodePropertySetValueReferenceExpression());
             codeMemberProperty.SetStatements.Add(assignStatement);
-            if (!useLazy)
-                codeMemberProperty.Attributes = codeMemberProperty.Attributes | MemberAttributes.Final;
+            /*if (!useLazy)
+                codeMemberProperty.Attributes = codeMemberProperty.Attributes | MemberAttributes.Final;*/
             return codeMemberProperty;
         }
 
@@ -131,8 +143,8 @@ namespace NMG.Core.Generator
                                              Attributes = MemberAttributes.Public,
                                              Type = new CodeTypeReference(type)
                                          };
-            if (!useLazy)
-                codeMemberProperty.Attributes = codeMemberProperty.Attributes | MemberAttributes.Final;
+            /*if (!useLazy)
+                codeMemberProperty.Attributes = codeMemberProperty.Attributes | MemberAttributes.Final;*/
             return codeMemberProperty;
         }
 
@@ -146,8 +158,8 @@ namespace NMG.Core.Generator
                                              Attributes = MemberAttributes.Public,
                                              Type = new CodeTypeReference(typeName)
                                          };
-            if (!useLazy)
-                codeMemberProperty.Attributes = codeMemberProperty.Attributes | MemberAttributes.Final;
+            /*if (!useLazy)
+                codeMemberProperty.Attributes = codeMemberProperty.Attributes | MemberAttributes.Final;*/
             return codeMemberProperty;
         }
 

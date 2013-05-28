@@ -22,11 +22,12 @@ namespace NMG.Core.Generator
             language = appPrefs.Language;
         }
 
+        public string ClassName { get { return string.Format("{0}{1}", appPrefs.ClassNamePrefix, Formatter.FormatSingular(Table.Name)); } }
+
         public override void Generate()
         {
-            var className = string.Format("{0}{1}", appPrefs.ClassNamePrefix, Formatter.FormatSingular(Table.Name));
-            var compileUnit = GetCompileUnit(className);
-            WriteToFile(compileUnit, className);
+            var compileUnit = GetCompileUnit(ClassName);
+            WriteToFile(compileUnit, ClassName);
         }
 
         public CodeCompileUnit GetCompileUnit(string className)
@@ -142,7 +143,7 @@ namespace NMG.Core.Generator
             }
         }
 
-        private void WriteToFile(CodeCompileUnit compileUnit, string className)
+        public void WriteToFile(CodeCompileUnit compileUnit, string className)
         {
             var provider = GetCodeDomProvider();
             var sourceFile = GetCompleteFilePath(provider, className);

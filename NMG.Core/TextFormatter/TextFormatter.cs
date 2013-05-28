@@ -40,8 +40,15 @@ namespace NMG.Core.TextFormatter
     public class PascalCaseTextFormatter : AbstractTextFormatter
     {
         public override string FormatText(string text)
-        {
-            return text.ToPascalCase();
+        {            
+            var txt = text.ToPascalCase();
+            if (txt.EndsWith("guid")) {
+                txt = txt.Substring(0, txt.Length - 4) + "Guid";
+            }
+            else if (txt.EndsWith("id")) {
+                txt = txt.Substring(0, txt.Length - 2) + "Id";
+            }
+            return txt;
         }
     }
 

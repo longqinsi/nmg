@@ -19,20 +19,25 @@ namespace NMG.Core.Generator
             language = this.appPrefs.Language;
         }
 
+        public string ClassName { get {return string.Format("{0}{1}{2}", appPrefs.ClassNamePrefix, Formatter.FormatSingular(Table.Name), "Map");} }
+
         public override void Generate()
         {
-			var className = string.Format("{0}{1}{2}", appPrefs.ClassNamePrefix, Formatter.FormatSingular(Table.Name), "Map");
-            var compileUnit = GetCompleteCompileUnit(className);
-            var generateCode = GenerateCode(compileUnit, className);
-            WriteToFile(generateCode, className);
+            var compileUnit = GetCompleteCompileUnit(ClassName);
+            var generateCode = GenerateCode(compileUnit, ClassName);
+            WriteToFile(generateCode, ClassName);
         }
 
-        public CodeCompileUnit GetCompleteCompileUnit(string className)
+        public CodeCompileUnit GetCompleteCompileUnit(string className) {
+            return GetCompleteCompileUnit(new CodeCompileUnit(), className);
+        }
+
+        public CodeCompileUnit GetCompleteCompileUnit(CodeCompileUnit codeCompileUnit, string className)
         {
             var codeGenerationHelper = new CodeGenerationHelper();
-            var compileUnit = codeGenerationHelper.GetCodeCompileUnit(nameSpace, className);
+            var compileUnit = codeGenerationHelper.GetCodeCompileUnit(codeCompileUnit, nameSpace, className);
 
-            var newType = compileUnit.Namespaces[0].Types[0];
+            var newType = compileUnit.Namespaces[0].Types.Cast<CodeTypeDeclaration>().First(ct => ct.Name == className);
             
             newType.IsPartial = appPrefs.GeneratePartialClasses;
 
@@ -40,7 +45,7 @@ namespace NMG.Core.Generator
 
             var constructor = new CodeConstructor {Attributes = MemberAttributes.Public};
             constructor.Statements.Add(new CodeSnippetStatement(TABS + "Table(\"" + Table.Name + "\");"));
-            constructor.Statements.Add(new CodeSnippetStatement(TABS + "LazyLoad();"));
+            //constructor.Statements.Add(new CodeSnippetStatement(TABS + "LazyLoad();"));
 
             if(UsesSequence)
             {

@@ -36,14 +36,16 @@ namespace NHibernateMappingGenerator
 
         public void Generate()
         {
-            codeGenerator.Generate();
+            //codeGenerator.Generate();
             if (applicationPreferences.IsNhFluent)
             {
                 nhFluentGenerator.Generate();
             }
-            else if (applicationPreferences.IsFluent)
-            {
-                fluentGenerator.Generate();
+            else if (applicationPreferences.IsFluent) {
+                var ccu = codeGenerator.GetCompileUnit(codeGenerator.ClassName);
+                ccu = fluentGenerator.GetCompleteCompileUnit(ccu, fluentGenerator.ClassName);
+                var generateCode = fluentGenerator.GenerateCode(ccu, fluentGenerator.ClassName);
+                fluentGenerator.WriteToFile(generateCode, codeGenerator.ClassName);
             }
             else if (applicationPreferences.IsCastle)
             {

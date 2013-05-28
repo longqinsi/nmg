@@ -25,12 +25,13 @@ namespace NMG.Core.Generator
             using (provider)
             {
                 var stringWriter = new StringWriter(stringBuilder);
-                provider.GenerateCodeFromCompileUnit(compileUnit, stringWriter, new CodeGeneratorOptions());
+                provider.GenerateCodeFromCompileUnit(compileUnit, stringWriter,
+                                                     new CodeGeneratorOptions {BlankLinesBetweenMembers = false});
             }
             return CleanupCode(stringBuilder.ToString());
         }
 
-        protected void WriteToFile(string content, string fileName)
+        public void WriteToFile(string content, string fileName)
         {
             var provider = GetCodeDomProvider();
             string sourceFile = GetCompleteFilePath(provider, fileName);
